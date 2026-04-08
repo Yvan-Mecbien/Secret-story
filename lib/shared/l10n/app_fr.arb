@@ -1,0 +1,198 @@
+{
+  "@@locale": "fr",
+  "appName": "Secret Story",
+  "appTitle": "Secret Story",
+  "login": "Connexion",
+  "register": "Inscription",
+  "logout": "Déconnexion",
+  "pseudo": "Pseudo",
+  "password": "Mot de passe",
+  "confirmPassword": "Confirmer le mot de passe",
+  "secret": "Votre secret",
+  "secretHint": "Ex : J'ai peur des papillons...",
+  "loginButton": "Se connecter",
+  "registerButton": "Rejoindre le jeu",
+  "noAccount": "Pas encore inscrit ? ",
+  "alreadyAccount": "Déjà un compte ? ",
+  "pseudoRequired": "Entrez votre pseudo",
+  "pseudoTooShort": "Minimum 3 caractères",
+  "passwordRequired": "Entrez un mot de passe",
+  "passwordTooShort": "Minimum 6 caractères",
+  "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+  "secretRequired": "Votre secret ne peut pas être vide",
+  "secretTooShort": "Secret trop court (min 10 caractères)",
+  "loginError": "Pseudo ou mot de passe incorrect.",
+  "registerError": "Ce pseudo est peut-être déjà utilisé.",
+  "welcome": "Bienvenue dans Secret Story !",
+  "welcomeSub": "Entrez votre secret pour rejoindre le jeu.",
+  "secretInfo": "Votre secret restera caché aux autres joueurs jusqu'à la fin.",
+  "waitingTitle": "Le jeu n'a pas encore commencé",
+  "waitingSubtitle": "Merci de patienter...\nL'administrateur lancera la partie prochainement.",
+  "home": "Accueil",
+  "leaderboard": "Classement",
+  "games": "Jeux",
+  "votes": "Votes",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "rankingTitle": "🏆 Classement",
+  "seeAll": "Voir tout ({count})",
+  "@seeAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "points": "points",
+  "pts": "pts",
+  "me": "Moi",
+  "eliminated": "Éliminé",
+  "active": "Actif",
+  "group": "Groupe",
+  "podiumTitle": "🏆 Podium",
+  "tabActive": "Actifs",
+  "tabAll": "Général",
+  "noPlayers": "Aucun joueur encore",
+  "gamesAvailable": "Jeux disponibles",
+  "gamesSoon": "Prochainement",
+  "noGames": "Aucun jeu disponible",
+  "noGamesSub": "L'administrateur activera les jeux\npendant la partie.",
+  "alreadyPlayed": "Déjà joué",
+  "play": "Jouer",
+  "comingSoon": "Bientôt disponible",
+  "voteTitle": "Vote d'élimination",
+  "votePhaseHeader": "Phase de vote",
+  "voteInstruction": "Choisissez un joueur à éliminer.\nVous ne pouvez voter qu'une seule fois.",
+  "voteButton": "🗳️ Voter pour ce joueur",
+  "voteSelectFirst": "Sélectionnez un joueur",
+  "voteConfirmTitle": "Confirmer le vote",
+  "voteConfirmText": "Êtes-vous sûr ? Vous ne pouvez voter que trois  fois par session.",
+  "voteSuccess": "✅ Vote enregistré !",
+  "voteDone": "Vote enregistré !",
+  "voteDoneSub": "Votre vote a été pris en compte.\nLes résultats seront annoncés prochainement.",
+  "voteNotOpen": "Vote non disponible",
+  "voteNotOpenSub": "Les votes ne sont pas ouverts pour le moment.\nPhase actuelle : {phase}",
+  "@voteNotOpenSub": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "gameNotStartedLock": "La partie n'a pas encore commencé",
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "myProfile": "Mon profil",
+  "mySecret": "Mon secret 🤫",
+  "reveal": "Révéler",
+  "hide": "Masquer",
+  "pointHistory": "Historique des points",
+  "noHistory": "Aucun point encore gagné",
+  "status": "Statut",
+  "logoutConfirmTitle": "Déconnexion",
+  "logoutConfirmText": "Voulez-vous vraiment vous déconnecter ?",
+  "phaseWaiting": "En attente",
+  "phaseGame": "Phase de jeu",
+  "phaseVote": "Phase de vote",
+  "phaseElimination": "Élimination en cours",
+  "phaseFinished": "Partie terminée",
+  "questionLabel": "Question {current}/{total}",
+  "@questionLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "nextQuestion": "Question suivante →",
+  "seeResults": "Voir mes résultats",
+  "goodAnswers": "{score} / {total} bonnes réponses",
+  "@goodAnswers": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "submitScore": "Valider et récupérer mes points",
+  "pointsEarned": "+{points} points gagnés !",
+  "@pointsEarned": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "backToGames": "Retour aux jeux",
+  "appearance": "Apparence",
+  "themeLight": "Clair",
+  "themeDark": "Sombre",
+  "themeSystem": "Système",
+  "language": "Langue",
+  "french": "Français",
+  "english": "English",
+  "gameActive": "Actif",
+  "pointsReward": "+{pts} pts",
+  "@pointsReward": {
+    "placeholders": {
+      "pts": {
+        "type": "int"
+      }
+    }
+  },
+  "refresh": "Rafraîchir",
+  "voteGameTitle": "Vote — Devinez les secrets",
+  "voteSelectSecret": "Choisir un secret",
+  "voteSelectPlayer": "Choisir un joueur",
+  "voteSearchPlayer": "Rechercher un joueur...",
+  "voteSecretDropdownHint": "Sélectionnez un secret",
+  "votePlayerDropdownHint": "Sélectionnez un joueur",
+  "voteSubmitGuess": "🗳️ Soumettre le vote",
+  "voteAttemptsLeft": "{n} vote(s) restant(s) aujourd'hui",
+  "@voteAttemptsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "voteNoAttemptsLeft": "Vous avez utilisé vos 3 votes aujourd'hui",
+  "voteCorrect": "🎉 Bonne réponse ! Le joueur est éliminé !",
+  "voteWrong": "❌ Mauvais ! -10 pts de pénalité.",
+  "voteResultTitle": "Résultat du vote",
+  "votePenaltyWarning": "Attention : un mauvais vote vous coûte 10 points, et deux mauvais votes révèlent un indice sur vous !",
+  "indicesTitle": "Indices révélés",
+  "noIndices": "Aucun indice révélé pour le moment",
+  "voteCompleteSelectBoth": "Sélectionnez un secret et un joueur",
+  "voteSectionSecret": "1. Choisissez un secret",
+  "voteSectionPlayer": "2. Choisissez le joueur",
+  "voteRandomSecrets": "Les secrets sont affichés aléatoirement",
+  "send": "Partager",
+  "indice": "Indices",
+  "messenger": "Messages",
+  "registerClose": "Inscriptions fermées",
+  "jeuStart": "Le jeu a déjà commencé",
+
+  "registerNo": "Les nouvelles inscriptions ne sont plus autorisées.",
+  "backlogin": "Retour à la connexion'",
+  "errorC": "Erreur de chargement",
+  "warning": "Attention",
+  "passwordWarningMessage": "Mémorisez bien votre mot de passe. En cas d'oubli, il ne pourra pas être récupéré et vous perdrez l’accès à votre compte.",
+  "indicesSoonAvailable": "Indice bientôt disponible",
+  "indicesDialogTitle": "Indices à venir",
+  "indicesCount": "{n} indice(s)",
+  "@indicesCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
+
+}

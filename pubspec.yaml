@@ -1,0 +1,50 @@
+name: app
+description: Jeu social Secret Story avec Flutter et Supabase
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Backend
+  supabase_flutter: ^2.3.4
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # UI & animations
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+  gap: ^3.0.1
+
+  # Utils
+  intl: ^0.20.0
+  uuid: ^4.4.0
+  flutter_gen: ^5.13.0+1
+  connectivity_plus: ^7.0.0
+  flutter_expandable_fab: ^2.5.2
+  url_launcher: ^6.3.2
+  shared_preferences: ^2.5.5
+  flutter_secure_storage: ^10.0.0
+  hive: ^2.2.3
+  crypto: ^3.0.7
+  circle_nav_bar: ^2.2.0
+ 
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/

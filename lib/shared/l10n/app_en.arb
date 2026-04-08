@@ -1,0 +1,197 @@
+{
+  "@@locale": "en",
+  "appName": "Secret Story",
+  "appTitle": "Secret Story",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout",
+  "pseudo": "Username",
+  "password": "Password",
+  "confirmPassword": "Confirm password",
+  "secret": "Your secret",
+  "secretHint": "E.g. I'm afraid of butterflies...",
+  "loginButton": "Sign in",
+  "registerButton": "Join the game",
+  "noAccount": "Not registered yet? ",
+  "alreadyAccount": "Already have an account? ",
+  "pseudoRequired": "Enter your username",
+  "pseudoTooShort": "Minimum 3 characters",
+  "passwordRequired": "Enter a password",
+  "passwordTooShort": "Minimum 6 characters",
+  "passwordsNoMatch": "Passwords do not match",
+  "secretRequired": "Your secret cannot be empty",
+  "secretTooShort": "Secret too short (min 10 chars)",
+  "loginError": "Wrong username or password.",
+  "registerError": "This username may already be taken.",
+  "welcome": "Welcome to Secret Story!",
+  "welcomeSub": "Enter your secret to join the game.",
+  "secretInfo": "Your secret will stay hidden from other players until the end.",
+  "waitingTitle": "The game hasn't started yet",
+  "waitingSubtitle": "Please wait...\nThe admin will start the game soon.",
+  "home": "Home",
+  "leaderboard": "Leaderboard",
+  "games": "Games",
+  "votes": "Votes",
+  "profile": "Profile",
+  "settings": "Settings",
+  "rankingTitle": "🏆 Leaderboard",
+  "seeAll": "See all ({count})",
+  "@seeAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "points": "points",
+  "pts": "pts",
+  "me": "Me",
+  "eliminated": "Eliminated",
+  "active": "Active",
+  "group": "Group",
+  "podiumTitle": "🏆 Podium",
+  "tabActive": "Active",
+  "tabAll": "All",
+  "noPlayers": "No players yet",
+  "gamesAvailable": "Available games",
+  "gamesSoon": "Coming soon",
+  "noGames": "No games available",
+  "noGamesSub": "The admin will activate games\nduring the game.",
+  "alreadyPlayed": "Already played",
+  "play": "Play",
+  "comingSoon": "Coming soon",
+  "voteTitle": "Elimination vote",
+  "votePhaseHeader": "Vote phase",
+  "voteInstruction": "Choose a player to eliminate.\nYou can only vote once.",
+  "voteButton": "🗳️ Vote for this player",
+  "voteSelectFirst": "Select a player",
+  "voteConfirmTitle": "Confirm vote",
+  "voteConfirmText": "Are you sure? You can only vote three times per session.",
+  "voteSuccess": "✅ Vote recorded!",
+  "voteDone": "Vote recorded!",
+  "voteDoneSub": "Your vote has been counted.\nResults will be announced soon.",
+  "voteNotOpen": "Vote not available",
+  "voteNotOpenSub": "Votes are not open right now.\nCurrent phase: {phase}",
+  "@voteNotOpenSub": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "gameNotStartedLock": "The game hasn't started yet",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "myProfile": "My profile",
+  "mySecret": "My secret 🤫",
+  "reveal": "Reveal",
+  "hide": "Hide",
+  "pointHistory": "Points history",
+  "noHistory": "No points earned yet",
+  "status": "Status",
+  "logoutConfirmTitle": "Logout",
+  "logoutConfirmText": "Are you sure you want to logout?",
+  "phaseWaiting": "Waiting",
+  "phaseGame": "Game phase",
+  "phaseVote": "Vote phase",
+  "phaseElimination": "Elimination in progress",
+  "phaseFinished": "Game over",
+  "questionLabel": "Question {current}/{total}",
+  "@questionLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "nextQuestion": "Next question →",
+  "seeResults": "See my results",
+  "goodAnswers": "{score} / {total} correct answers",
+  "@goodAnswers": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "submitScore": "Submit and claim my points",
+  "pointsEarned": "+{points} points earned!",
+  "@pointsEarned": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "backToGames": "Back to games",
+  "appearance": "Appearance",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "language": "Language",
+  "french": "Français",
+  "english": "English",
+  "gameActive": "Active",
+  "pointsReward": "+{pts} pts",
+  "@pointsReward": {
+    "placeholders": {
+      "pts": {
+        "type": "int"
+      }
+    }
+  },
+  "refresh": "Refresh",
+  "voteGameTitle": "Vote — Guess the secrets",
+  "voteSelectSecret": "Choose a secret",
+  "voteSelectPlayer": "Choose a player",
+  "voteSearchPlayer": "Search a player...",
+  "voteSecretDropdownHint": "Select a secret",
+  "votePlayerDropdownHint": "Select a player",
+  "voteSubmitGuess": "🗳️ Submit vote",
+  "voteAttemptsLeft": "{n} vote(s) left today",
+  "@voteAttemptsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "voteNoAttemptsLeft": "You have used your 3 votes today",
+  "voteCorrect": "🎉 Correct! The player is eliminated!",
+  "voteWrong": "❌ Wrong! -10 pts penalty.",
+  "voteResultTitle": "Vote result",
+  "votePenaltyWarning": "WWarning: one wrong vote costs you 10 points, and two wrong votes reveal a clue about you!",
+  "indicesTitle": "Revealed clues",
+  "noIndices": "No clues revealed yet",
+  "voteCompleteSelectBoth": "Select a secret and a player",
+  "voteSectionSecret": "1. Choose a secret",
+  "voteSectionPlayer": "2. Choose a player",
+  "voteRandomSecrets": "Secrets are displayed randomly",
+  "send": "Share",
+"indice": "Clues",
+"messenger": "Messages",
+"registerClose": "Registration closed",
+"jeuStart": "The game has already started",
+"registerNo": "New registrations are no longer permitted.",
+"backlogin": "Return to login",
+"errorC": "Loading error",
+"indicesSoonAvailable": "Index coming soon",
+"indicesDialogTitle": "Indices coming soon",
+"warning": "Warning",
+"passwordWarningMessage": "Please remember your password carefully. In case of loss, it cannot be recovered and you will lose access to your account.",
+"indicesCount": "{n} index(es)",
+"@indicesCount": {
+"placeholders": {
+"n": {
+"type": "int"
+
+}
+}
+}
+}
