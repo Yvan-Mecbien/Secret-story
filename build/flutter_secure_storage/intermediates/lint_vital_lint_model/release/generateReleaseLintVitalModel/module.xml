@@ -1,0 +1,19 @@
+<lint-module
+    format="1"
+    dir="/home/dylane/.pub-cache/hosted/pub.dev/flutter_secure_storage-10.0.0/android"
+    name=":flutter_secure_storage"
+    type="LIBRARY"
+    maven="com.it_nomads.fluttersecurestorage:flutter_secure_storage:1.0-SNAPSHOT"
+    agpVersion="8.11.1"
+    buildFolder="/home/dylane/Bureau/Work/App/app/build/flutter_secure_storage"
+    bootClassPath="/home/dylane/Android/Sdk/platforms/android-36/android.jar:/home/dylane/Android/Sdk/build-tools/35.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="17"
+    compileTarget="android-36"
+    neverShrinking="true">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>
