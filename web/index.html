@@ -1,46 +1,473 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classement Temps Réel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* --- THÈME DARK (défaut) --- */
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f8;
+    --muted: #6b6b82;
+    --accent1: #6c63ff;
+    --accent2: #ff6b6b;
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+    --green: #4ade80;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+  /* --- THÈME CLAIR --- */
+  body.light-theme {
+    --bg: #f8f9fc;
+    --surface: #ffffff;
+    --surface2: #f1f3f8;
+    --border: rgba(0,0,0,0.08);
+    --text: #1e1f2c;
+    --muted: #6c6e7c;
+    --accent1: #5a55e0;
+    --accent2: #e25555;
+    --gold: #b8860b;
+    --silver: #8a8a8a;
+    --bronze: #b87333;
+    --green: #2e8b57;
+  }
 
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>app</title>
-  <link rel="manifest" href="manifest.json">
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.2s, color 0.2s;
+  }
+  .bg-fx {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 60% 50% at 15% 20%, var(--accent1) 0%, transparent 70%);
+    opacity: 0.05;
+  }
+  .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 16px 80px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 16px; position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px); background: color-mix(in srgb, var(--bg) 85%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+  .logo span { color: var(--accent1); }
+  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); font-weight: 600; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .admin-btn, .theme-btn {
+    background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent1); padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .admin-btn:hover, .theme-btn:hover { background: rgba(108,99,255,0.25); border-color: var(--accent1); }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .page-header { text-align: center; padding: 40px 0 32px; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: clamp(28px, 7vw, 48px); font-weight: 800; letter-spacing: -1px; }
+  .page-sub { color: var(--muted); margin-top: 8px; font-size: 15px; }
+  .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+  @media(max-width: 500px) { .teams-grid { grid-template-columns: 1fr; } }
+  .team-card {
+    border-radius: var(--radius); padding: 28px 24px;
+    border: 1px solid var(--border); position: relative;
+    transition: transform 0.2s;
+  }
+  .team-card.team-a { background: linear-gradient(135deg, rgba(108,99,255,0.12) 0%, rgba(108,99,255,0.02) 100%); border-color: rgba(108,99,255,0.3); }
+  .team-card.team-b { background: linear-gradient(135deg, rgba(255,107,107,0.12) 0%, rgba(255,107,107,0.02) 100%); border-color: rgba(255,107,107,0.3); }
+  .team-card.leader::after {
+    content: '👑 EN TÊTE'; position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 700; background: rgba(255,215,0,0.15); color: var(--gold);
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .team-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .team-a .team-name { color: var(--accent1); }
+  .team-b .team-name { color: var(--accent2); }
+  .team-score { font-family: 'Syne', sans-serif; font-size: clamp(42px, 10vw, 64px); font-weight: 800; line-height: 1; }
+  .team-a .team-score { color: var(--accent1); }
+  .team-b .team-score { color: var(--accent2); }
+  .team-pts-label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .team-members-count { margin-top: 16px; font-size: 12px; color: var(--muted); }
+  .vs-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin: -8px 0 32px; }
+  .vs-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--muted); }
+  .vs-line { flex: 1; height: 1px; background: var(--border); }
+  .progress-section { margin-bottom: 40px; }
+  .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+  .progress-bar { height: 8px; border-radius: 100px; background: var(--surface); overflow: hidden; }
+  .progress-fill-a { height: 100%; background: var(--accent1); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .progress-fill-b { height: 100%; background: var(--accent2); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .progress-inner { display: flex; height: 100%; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .activity-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 500;
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn.active { background: rgba(108,99,255,0.2); border-color: var(--accent1); color: var(--accent1); }
+  .members-list { display: flex; flex-direction: column; gap: 8px; }
+  .member-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 16px;
+  }
+  .rank-badge {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .rank-1 { background: rgba(255,215,0,0.15); color: var(--gold); }
+  .rank-2 { background: rgba(192,192,192,0.15); color: var(--silver); }
+  .rank-3 { background: rgba(205,127,50,0.15); color: var(--bronze); }
+  .rank-n { background: var(--surface2); color: var(--muted); }
+  .member-name { flex: 1; font-weight: 500; font-size: 14px; }
+  .member-team-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .badge-a { background: rgba(108,99,255,0.15); color: var(--accent1); }
+  .badge-b { background: rgba(255,107,107,0.15); color: var(--accent2); }
+  .member-points { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; min-width: 50px; text-align: right; }
+  .points-a { color: var(--accent1); }
+  .points-b { color: var(--accent2); }
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; font-size: 18px;
+  }
+  .modal-body { padding: 20px 24px; }
+  .modal-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; gap: 8px; }
+  .modal-tab { padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; color: var(--muted); }
+  .modal-tab.active { color: var(--accent1); border-color: var(--accent1); }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
+  .form-input, .form-select {
+    width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text); font-size: 14px;
+  }
+  .btn {
+    width: 100%; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent1); color: white; }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn-danger { background: rgba(255,107,107,0.15); color: var(--accent2); border: 1px solid rgba(255,107,107,0.3); }
+  .member-admin-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; max-height: 300px; overflow-y: auto; }
+  .member-admin-row {
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+    background: var(--surface2); border-radius: var(--radius-sm); border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .member-admin-name { flex: 1; font-size: 13px; }
+  .points-input { width: 65px; padding: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); text-align: center; }
+  .inc-dec-group { display: flex; gap: 4px; }
+  .inc-dec-btn {
+    width: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-weight: bold; cursor: pointer;
+  }
+  .save-pts-btn { padding: 5px 10px; background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.25); border-radius: 6px; cursor: pointer; }
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 12px 18px; border-radius: var(--radius-sm); font-size: 13px;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .empty-state { text-align: center; padding: 40px; color: var(--muted); }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent1); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-center { display: flex; justify-content: center; padding: 40px; }
+</style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+<div class="bg-fx"></div>
+<header>
+  <div class="logo">SCORE<span>LIVE</span></div>
+  <div class="live-badge"><div class="live-dot"></div> EN DIRECT</div>
+  <div class="header-actions">
+    <button class="theme-btn" onclick="toggleTheme()">🌓 Thème</button>
+    <button class="admin-btn" onclick="openAdminModal()">⚙ Admin</button>
+  </div>
+</header>
+<div class="container">
+  <div class="page-header">
+    <div class="page-title">Classement Général</div>
+    <div class="page-sub">Mis à jour en temps réel</div>
+  </div>
+  <div class="loading-center" id="mainLoader"><div class="spinner"></div></div>
+  <div id="mainContent" style="display:none">
+    <div class="teams-grid" id="teamsGrid"></div>
+    <div class="vs-row"><div class="vs-line"></div><div class="vs-text">VS</div><div class="vs-line"></div></div>
+    <div class="progress-section">
+      <div class="progress-label"><span id="progressLabelA">Équipe A</span><span id="progressLabelB">Équipe B</span></div>
+      <div class="progress-bar"><div class="progress-inner"><div class="progress-fill-a" id="progressA" style="width:50%"></div><div class="progress-fill-b" id="progressB" style="width:50%"></div></div></div>
+    </div>
+    <div class="section-title">Classement par activité</div>
+    <div class="activity-tabs" id="activityTabs"></div>
+    <div class="members-list" id="membersList"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">Connexion Admin</div><button class="modal-close" onclick="closeModal('adminModal')">×</button></div>
+    <div class="modal-body">
+      <div id="loginPanel">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="adminEmail" placeholder="admin@example.com"></div>
+        <div class="form-group"><label class="form-label">Mot de passe</label><input type="password" class="form-input" id="adminPassword" placeholder="••••••••"></div>
+        <button class="btn btn-primary" onclick="adminLogin()">Se connecter</button>
+      </div>
+      <div id="adminPanel" style="display:none">
+        <div class="modal-tabs"><div class="modal-tab active" onclick="switchAdminTab('teams')">Équipes</div><div class="modal-tab" onclick="switchAdminTab('activities')">Activités</div><div class="modal-tab" onclick="switchAdminTab('members')">Membres</div><div class="modal-tab" onclick="switchAdminTab('points')">Points</div></div>
+        <div id="tab-teams"><div class="admin-section"><div class="admin-section-title">Modifier les équipes</div><div class="form-group"><label class="form-label">Nom Équipe A</label><input type="text" class="form-input" id="teamAName" placeholder="Ex: Les Aigles"></div><div class="form-group"><label class="form-label">Nom Équipe B</label><input type="text" class="form-input" id="teamBName" placeholder="Ex: Les Lions"></div><button class="btn btn-primary" onclick="saveTeamNames()">Enregistrer</button></div><button class="btn btn-danger" style="margin-top:12px" onclick="adminLogout()">Déconnexion</button></div>
+        <div id="tab-activities" style="display:none"><div class="admin-section"><div class="admin-section-title">Ajouter une activité</div><div class="form-group"><label class="form-label">Nom</label><input type="text" class="form-input" id="newActivity" placeholder="Ex: Sprint"></div><button class="btn btn-primary" onclick="addActivity()">Ajouter</button></div><div class="admin-section"><div class="admin-section-title">Activités existantes</div><div id="activitiesAdminList"></div></div></div>
+        <div id="tab-members" style="display:none"><div class="admin-section"><div class="admin-section-title">Ajouter un membre</div><div class="form-group"><label class="form-label">Nom</label><input type="text" class="form-input" id="newMemberName" placeholder="Prénom Nom"></div><div class="form-group"><label class="form-label">Équipe</label><select class="form-select" id="newMemberTeam"></select></div><div class="form-group"><label class="form-label">Activité (obligatoire)</label><select class="form-select" id="newMemberActivity"></select><small style="color:var(--muted)">Le membre sera rattaché à cette activité</small></div><button class="btn btn-primary" onclick="addMember()">Ajouter le membre</button></div></div>
+        <div id="tab-points" style="display:none"><div class="admin-section"><div class="admin-section-title">Modifier les points</div><div class="form-group"><label class="form-label">Activité</label><select class="form-select" id="pointsActivitySelect" onchange="loadPointsForActivity()"></select></div><div id="pointsMemberList" class="member-admin-list"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// ========== CONFIGURATION SUPABASE ==========
+// ⚠️ REMPLACEZ CES VALEURS PAR LES VÔTRES (trouvées dans les paramètres de votre projet Supabase)
+const SUPABASE_URL = 'https://wccqzluwthbkcdippkij.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_CYFlnmd8UGKJdjGpiLuLCw_Don9oIJw';
+const ADMIN_PASSWORD = 'admin123';
+const { createClient } = supabase;
+let sb = null;
+let isAdmin = false;
+let currentActivity = 'all';
+let allMembers = [], allTeams = [], allActivities = [], allScores = [];
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+function init() {
+  if (!SUPABASE_URL || SUPABASE_URL === 'https://VOTRE_PROJET.supabase.co') {
+    showToast('Configurez SUPABASE_URL et SUPABASE_ANON_KEY dans le code', 'error');
+    document.getElementById('mainLoader').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('mainContent').innerHTML = '<div class="empty-state">⚠️ Configuration Supabase requise. Modifiez les constantes dans le script.</div>';
+    return;
+  }
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  loadData().then(() => setupRealtime());
+}
+
+async function loadData() {
+  try {
+    const [t, a, m, s] = await Promise.all([
+      sb.from('teams').select('*').order('id'),
+      sb.from('activities').select('*').order('created_at'),
+      sb.from('members').select('*').order('name'),
+      sb.from('scores').select('*')
+    ]);
+    allTeams = t.data || [];
+    allActivities = a.data || [];
+    allMembers = m.data || [];
+    allScores = s.data || [];
+    renderAll();
+  } catch(e) { console.error(e); showToast('Erreur chargement', 'error'); }
+}
+
+function renderAll() {
+  document.getElementById('mainLoader').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  renderTeams();
+  renderActivityTabs();
+  renderMembers();
+}
+
+function getMemberTotal(memberId, activityId = null) {
+  return allScores.filter(s => s.member_id === memberId && (activityId === null || s.activity_id === activityId)).reduce((sum, s) => sum + (s.points || 0), 0);
+}
+function getTeamTotal(teamId, activityId = null) {
+  return allMembers.filter(m => m.team_id === teamId).reduce((sum, m) => sum + getMemberTotal(m.id, activityId), 0);
+}
+
+function renderTeams() {
+  const actId = currentActivity === 'all' ? null : parseInt(currentActivity);
+  const scores = allTeams.map(t => ({ team: t, total: getTeamTotal(t.id, actId) }));
+  const leaderIdx = scores[0]?.total > scores[1]?.total ? 0 : scores[1]?.total > scores[0]?.total ? 1 : -1;
+  const grid = document.getElementById('teamsGrid');
+  grid.innerHTML = scores.map((s, i) => `<div class="team-card ${i===0?'team-a':'team-b'} ${leaderIdx===i?'leader':''}"><div class="team-name">${s.team.name || (i===0?'Équipe A':'Équipe B')}</div><div class="team-score">${s.total}</div><div class="team-pts-label">points</div><div class="team-members-count">${allMembers.filter(m=>m.team_id===s.team.id).length} membres</div></div>`).join('');
+  const total = scores.reduce((s,v)=>s+v.total,0) || 1;
+  const pA = Math.round((scores[0]?.total/total)*100);
+  document.getElementById('progressA').style.width = pA+'%';
+  document.getElementById('progressB').style.width = (100-pA)+'%';
+  document.getElementById('progressLabelA').innerHTML = `${scores[0]?.team.name || 'A'} — ${pA}%`;
+  document.getElementById('progressLabelB').innerHTML = `${100-pA}% — ${scores[1]?.team.name || 'B'}`;
+}
+
+function renderActivityTabs() {
+  const tabs = document.getElementById('activityTabs');
+  tabs.innerHTML = [{ id:'all', name:'Tous' }, ...allActivities].map(a => `<button class="tab-btn ${currentActivity===String(a.id)?'active':''}" onclick="selectActivity('${a.id}')">${a.name}</button>`).join('');
+}
+
+function selectActivity(id) { currentActivity = String(id); renderActivityTabs(); renderTeams(); renderMembers(); }
+
+// Affiche les membres dont l'activité associée correspond à l'onglet sélectionné
+function renderMembers() {
+  const actId = currentActivity === 'all' ? null : parseInt(currentActivity);
+  let membersToShow = [];
+
+  if (actId === null) {
+    // Mode "Tous" : afficher tous les membres avec leur total général
+    membersToShow = allMembers.map(m => ({
+      member: m,
+      team: allTeams.find(t => t.id === m.team_id),
+      total: getMemberTotal(m.id, null)
+    }));
+  } else {
+    // Mode activité spécifique : ne garder que les membres dont l'activité associée correspond
+    membersToShow = allMembers
+      .filter(m => m.activity_id === actId)
+      .map(m => ({
+        member: m,
+        team: allTeams.find(t => t.id === m.team_id),
+        total: getMemberTotal(m.id, actId)
+      }));
+  }
+
+  membersToShow.sort((a,b) => b.total - a.total);
+
+  const list = document.getElementById('membersList');
+  if (membersToShow.length === 0) {
+    list.innerHTML = '<div class="empty-state">Aucun participant pour cette activité</div>';
+    return;
+  }
+
+  list.innerHTML = membersToShow.map((r, i) => {
+    const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+    const rankLabel = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+    const teamClass = r.team?.id === allTeams[0]?.id ? 'badge-a' : 'badge-b';
+    const ptsClass = r.team?.id === allTeams[0]?.id ? 'points-a' : 'points-b';
+    return `<div class="member-row">
+      <div class="rank-badge ${rankClass}">${rankLabel}</div>
+      <div class="member-name">${escapeHtml(r.member.name)}</div>
+      <div class="member-team-badge ${teamClass}">${escapeHtml(r.team?.name || '—')}</div>
+      <div class="member-points ${ptsClass}">${r.total}</div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+function setupRealtime() {
+  if(!sb) return;
+  const channel = sb.channel('realtime-all');
+  channel.on('postgres_changes', { event:'*', schema:'public', table:'scores' }, () => loadData())
+    .on('postgres_changes', { event:'*', schema:'public', table:'members' }, () => loadData())
+    .on('postgres_changes', { event:'*', schema:'public', table:'activities' }, () => loadData())
+    .on('postgres_changes', { event:'*', schema:'public', table:'teams' }, () => loadData())
+    .subscribe();
+}
+
+// Admin functions
+function openAdminModal() {
+  if(isAdmin) { showAdminPanel(); }
+  else { document.getElementById('loginPanel').style.display='block'; document.getElementById('adminPanel').style.display='none'; document.getElementById('modalTitle').innerText='Connexion Admin'; }
+  document.getElementById('adminModal').classList.add('open');
+}
+function showAdminPanel() { document.getElementById('loginPanel').style.display='none'; document.getElementById('adminPanel').style.display='block'; document.getElementById('modalTitle').innerText='Panneau Admin'; populateAdminPanels(); }
+function adminLogin() { if(document.getElementById('adminPassword').value === ADMIN_PASSWORD) { isAdmin=true; showAdminPanel(); showToast('Connecté'); } else showToast('Mot de passe incorrect','error'); }
+function adminLogout() { isAdmin=false; closeModal('adminModal'); showToast('Déconnecté'); }
+function populateAdminPanels() {
+  if(allTeams[0]) document.getElementById('teamAName').value = allTeams[0].name || '';
+  if(allTeams[1]) document.getElementById('teamBName').value = allTeams[1].name || '';
+  const aList = document.getElementById('activitiesAdminList');
+  aList.innerHTML = allActivities.length ? `<div class="member-admin-list">${allActivities.map(a=>`<div class="member-admin-row"><span class="member-admin-name">${escapeHtml(a.name)}</span><button class="save-pts-btn" style="background:rgba(255,107,107,0.1)" onclick="deleteActivity(${a.id})">Supprimer</button></div>`).join('')}</div>` : '<div class="empty-state">Aucune activité</div>';
+  const teamSel = document.getElementById('newMemberTeam');
+  teamSel.innerHTML = allTeams.map(t=>`<option value="${t.id}">${escapeHtml(t.name || 'Équipe '+t.id)}</option>`).join('');
+  const actSel = document.getElementById('newMemberActivity');
+  actSel.innerHTML = allActivities.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+  const pSel = document.getElementById('pointsActivitySelect');
+  pSel.innerHTML = allActivities.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+  if(allActivities.length) loadPointsForActivity();
+}
+function switchAdminTab(tab) {
+  ['teams','activities','members','points'].forEach(t=>document.getElementById('tab-'+t).style.display = t===tab?'block':'none');
+  document.querySelectorAll('.modal-tab').forEach((el,i)=>el.classList.toggle('active',['teams','activities','members','points'][i]===tab));
+  if(tab==='points' && allActivities.length) loadPointsForActivity();
+}
+async function saveTeamNames() { if(!sb) return; await sb.from('teams').update({name:document.getElementById('teamAName').value.trim()}).eq('id',allTeams[0]?.id); await sb.from('teams').update({name:document.getElementById('teamBName').value.trim()}).eq('id',allTeams[1]?.id); showToast('Noms mis à jour'); loadData(); }
+async function addActivity() { let name=document.getElementById('newActivity').value.trim(); if(!name) return; await sb.from('activities').insert({name}); document.getElementById('newActivity').value=''; showToast('Activité ajoutée'); loadData(); populateAdminPanels(); }
+async function deleteActivity(id) { await sb.from('scores').delete().eq('activity_id',id); await sb.from('activities').delete().eq('id',id); showToast('Supprimée'); loadData(); populateAdminPanels(); }
+async function addMember() {
+  let name = document.getElementById('newMemberName').value.trim();
+  let teamId = parseInt(document.getElementById('newMemberTeam').value);
+  let actId = parseInt(document.getElementById('newMemberActivity').value);
+  if (!name || !actId) { showToast('Nom et activité requis', 'error'); return; }
+  const { data: member, error } = await sb.from('members').insert({ name, team_id: teamId, activity_id: actId }).select().single();
+  if (error) { showToast('Erreur création: ' + error.message, 'error'); return; }
+  await sb.from('scores').insert({ member_id: member.id, activity_id: actId, points: 0 });
+  document.getElementById('newMemberName').value = '';
+  showToast('Membre ajouté avec son activité');
+  loadData();
+}
+function loadPointsForActivity() {
+  let actId = parseInt(document.getElementById('pointsActivitySelect').value);
+  let container = document.getElementById('pointsMemberList');
+  if (!actId || !allMembers.length) { container.innerHTML = '<div class="empty-state">Aucun membre</div>'; return; }
+  const membersForActivity = allMembers.filter(m => m.activity_id === actId);
+  if (membersForActivity.length === 0) { container.innerHTML = '<div class="empty-state">Aucun membre pour cette activité</div>'; return; }
+  container.innerHTML = membersForActivity.map(m => {
+    let score = allScores.find(s => s.member_id === m.id && s.activity_id === actId);
+    let pts = score ? score.points : 0;
+    let team = allTeams.find(t => t.id === m.team_id);
+    return `<div class="member-admin-row">
+      <span class="member-admin-name">${escapeHtml(m.name)} <small>${escapeHtml(team?.name || '')}</small></span>
+      <input type="number" class="points-input" id="pts_${m.id}_${actId}" value="${pts}" step="1">
+      <div class="inc-dec-group"><button class="inc-dec-btn" onclick="adjustPoints(${m.id},${actId},-1)">−</button><button class="inc-dec-btn" onclick="adjustPoints(${m.id},${actId},1)">+</button></div>
+      <button class="save-pts-btn" onclick="savePoints(${m.id},${actId})">✓</button>
+    </div>`;
+  }).join('');
+}
+function adjustPoints(memberId, actId, delta) {
+  let input = document.getElementById(`pts_${memberId}_${actId}`);
+  if (input) input.value = (parseInt(input.value) || 0) + delta;
+}
+async function savePoints(memberId, actId) {
+  let input = document.getElementById(`pts_${memberId}_${actId}`);
+  let points = parseInt(input.value) || 0;
+  let existing = allScores.find(s => s.member_id === memberId && s.activity_id === actId);
+  if (existing) await sb.from('scores').update({ points }).eq('id', existing.id);
+  else await sb.from('scores').insert({ member_id: memberId, activity_id: actId, points });
+  showToast('Points enregistrés');
+  await loadData();
+  loadPointsForActivity();
+}
+function toggleTheme() { document.body.classList.toggle('light-theme'); localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg, type='success') { let t=document.getElementById('toast'); t.innerText=msg; t.className=`toast show ${type}`; setTimeout(()=>t.classList.remove('show'),2500); }
+document.getElementById('adminModal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeModal('adminModal');});
+if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme');
+window.addEventListener('load', init);
+</script>
 </body>
 </html>
